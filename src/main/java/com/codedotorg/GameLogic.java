@@ -1,9 +1,14 @@
 package com.codedotorg;
 
+import java.util.Random;
+
 public class GameLogic {
 
     /** Whether or not the game is over */
     private boolean gameOver;
+
+    /** Random object for generating the computer's choice */
+    private Random random;
 
     /**
      * Constructor for the GameLogic class.
@@ -11,6 +16,7 @@ public class GameLogic {
      */
     public GameLogic() {
         gameOver = false;
+        random = new Random();
     }
 
     /**
@@ -20,19 +26,51 @@ public class GameLogic {
      * @return a String representing the computer's choice
      */
     public String getComputerChoice() {
-        
-        return "";
+        String[] choices = {"rock", "paper", "scissors"};
+        return choices[random.nextInt(choices.length)];
     }
 
     /**
-     * Determines the winner of a rock-paper-scissors game based on the user's predicted class and the computer's choice.
-     * @param predictedClass The user's predicted class.
+     * Determines the winner of a rock-paper-scissors game based on the
+     * user's predicted class and the computer's choice.
+     * 
+     * Model labels yang dikenali: "rock", "paper", "scissors"
+     * Label bisa berformat "0 rock", "1 paper", "2 scissors" —
+     * sehingga kita ambil kata terakhir saja.
+     * 
+     * @param predictedClass The user's predicted class from the model.
      * @param computerChoice The computer's choice.
-     * @return A string containing the computer choice, user choice, and the result of the game.
+     * @return A string containing the result of the game.
      */
     public String determineWinner(String predictedClass, String computerChoice) {
-        
-        return "";
+        if (predictedClass == null || computerChoice == null) {
+            return "";
+        }
+
+        // Ambil kata terakhir dari predictedClass
+        // (model bisa mengembalikan "0 rock", "1 paper", dll.)
+        String userChoice = predictedClass.trim().toLowerCase();
+        if (userChoice.contains(" ")) {
+            userChoice = userChoice.substring(userChoice.lastIndexOf(" ") + 1);
+        }
+
+        // Abaikan prediksi "neutral" atau tidak dikenali
+        if (!userChoice.equals("rock") && !userChoice.equals("paper") && !userChoice.equals("scissors")) {
+            return "";
+        }
+
+        // Tentukan pemenang
+        if (userChoice.equals(computerChoice)) {
+            return getTieResult();
+        } else if (
+            (userChoice.equals("rock")     && computerChoice.equals("scissors")) ||
+            (userChoice.equals("paper")    && computerChoice.equals("rock"))     ||
+            (userChoice.equals("scissors") && computerChoice.equals("paper"))
+        ) {
+            return getUserWinnerResult();
+        } else {
+            return getComputerWinnerResult();
+        }
     }
 
     /**
@@ -42,8 +80,8 @@ public class GameLogic {
      * @return A string indicating a tie result.
      */
     public String getTieResult() {
-        
-        return "";
+        gameOver = true;
+        return "It's a tie!";
     }
 
     /**
@@ -53,8 +91,8 @@ public class GameLogic {
      * @return a string indicating that the user has won
      */
     public String getUserWinnerResult() {
-        
-        return "";
+        gameOver = true;
+        return "You win!";
     }
 
     /**
@@ -64,8 +102,8 @@ public class GameLogic {
      * @return A string indicating that the player has lost.
      */
     public String getComputerWinnerResult() {
-        
-        return "";
+        gameOver = true;
+        return "Computer wins!";
     }
 
     /**
